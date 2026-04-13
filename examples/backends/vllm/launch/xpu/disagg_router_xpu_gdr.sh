@@ -10,14 +10,16 @@ export PYTHONHASHSEED=0
 
 # Common configuration
 MODEL="Qwen/Qwen3-0.6B"
+MODEL="/root/hlin76/Llama-3.1-8B/"
+
 BLOCK_SIZE=64
 VLLM_NIXL_DEVICE_TO_DEVICE=true
 NIXL_BUFFER_DEVICE=xpu
 VLLM_NIXL_BACKEND=UCX
 export UCX_MEMTYPE_CACHE=0
-export UCX_NET_DEVICES=mlx5_0:1,mlx5_1:1,mlx5_2:1,mlx5_3:1
-export UCX_TLS=ib,rc,ze_copy
-
+# export UCX_NET_DEVICES=mlx5_0:1,mlx5_1:1,mlx5_2:1,mlx5_3:1
+export UCX_TLS=ze_copy
+export UCX_TLS=tcp,ze_copy,ze_ipc,shm,self
 
 # Start frontend with KV routing
 # The frontend will automatically detect prefill workers and activate an internal prefill router
@@ -31,6 +33,7 @@ python -m dynamo.frontend \
 VLLM_NIXL_SIDE_CHANNEL_PORT=20096 \
 ZE_AFFINITY_MASK=0 python3 -m dynamo.vllm \
     --model $MODEL \
+    --max-model-len 1024 \
     --block-size $BLOCK_SIZE \
     --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_both\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"]}}" \
     --kv-events-config '{"publisher":"zmq","topic":"kv-events","endpoint":"tcp://*:5556", "enable_kv_cache_events":true}' &
@@ -38,6 +41,7 @@ ZE_AFFINITY_MASK=0 python3 -m dynamo.vllm \
 VLLM_NIXL_SIDE_CHANNEL_PORT=20097 \
 ZE_AFFINITY_MASK=1 python3 -m dynamo.vllm \
     --model $MODEL \
+    --max-model-len 1024 \
     --block-size $BLOCK_SIZE \
     --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_both\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"]}}" \
     --kv-events-config '{"publisher":"zmq","topic":"kv-events","endpoint":"tcp://*:5557", "enable_kv_cache_events":true}' &
@@ -48,6 +52,7 @@ ZE_AFFINITY_MASK=1 python3 -m dynamo.vllm \
 VLLM_NIXL_SIDE_CHANNEL_PORT=20098 \
 ZE_AFFINITY_MASK=2 python3 -m dynamo.vllm \
     --model $MODEL \
+    --max-model-len 1024 \
     --block-size $BLOCK_SIZE \
     --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_both\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"]}}" \
     --is-prefill-worker \
@@ -56,6 +61,7 @@ ZE_AFFINITY_MASK=2 python3 -m dynamo.vllm \
 VLLM_NIXL_SIDE_CHANNEL_PORT=20099 \
 ZE_AFFINITY_MASK=3 python3 -m dynamo.vllm \
     --model $MODEL \
+    --max-model-len 1024 \
     --block-size $BLOCK_SIZE \
     --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_both\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"]}}" \
     --is-prefill-worker \

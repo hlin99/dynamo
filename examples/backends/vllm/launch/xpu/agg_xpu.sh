@@ -15,7 +15,7 @@ export VLLM_TARGET_DEVICE=xpu
 
 # Default model
 MODEL="Qwen/Qwen3-0.6B"
-
+MODEL="/root/hlin76/Llama-3.1-8B/"
 # Parse command line arguments
 EXTRA_ARGS=()
 while [[ $# -gt 0 ]]; do
