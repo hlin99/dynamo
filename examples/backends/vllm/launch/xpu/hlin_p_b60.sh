@@ -20,6 +20,7 @@ VLLM_NIXL_BACKEND=UCX
 export UCX_MEMTYPE_CACHE=0
 export UCX_NET_DEVICES=rocep160s0f0:1,rocep160s0f1:1,rocep192s0f0:1,rocep192s0f1:1
 export UCX_NET_DEVICES=rocep160s0f0:1
+export VLLM_NIXL_SIDE_CHANNEL_HOST=192.168.1.45
 
 export UCX_TLS=rc,ze_copy,ze_ipc,shm,self
 #export UCX_TLS=tcp,self
@@ -34,7 +35,8 @@ python -m dynamo.frontend \
 VLLM_NIXL_SIDE_CHANNEL_PORT=20096 \
 ZE_AFFINITY_MASK=0 python3 -m dynamo.vllm \
     --model $MODEL \
+    --is-prefill-worker \
     --max-model-len 1024 \
     --block-size $BLOCK_SIZE \
-    --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_producer\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"]}}" \
+    --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_producer\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"], \"enable_permute_local_kv\": true}}" \
     --kv-events-config '{"publisher":"zmq","topic":"kv-events","endpoint":"tcp://*:5556", "enable_kv_cache_events":true}'

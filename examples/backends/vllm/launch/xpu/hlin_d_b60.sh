@@ -20,6 +20,7 @@ VLLM_NIXL_BACKEND=UCX
 export UCX_MEMTYPE_CACHE=0
 export UCX_NET_DEVICES=rocep160s0f0:1,rocep160s0f1:1,rocep192s0f0:1,rocep192s0f1:1
 export UCX_NET_DEVICES=rocep160s0f0:1
+export VLLM_NIXL_SIDE_CHANNEL_HOST=192.168.1.45
 
 export UCX_TLS=rc,ze_copy,ze_ipc,shm,self
 #export UCX_TLS=tcp,self
