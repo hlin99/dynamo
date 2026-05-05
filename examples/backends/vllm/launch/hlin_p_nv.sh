@@ -18,6 +18,7 @@ export UCX_MEMTYPE_CACHE=0
 export UCX_NET_DEVICES=mlx5_0:1,mlx5_1:1,mlx5_2:1,mlx5_3:1
 export UCX_NET_DEVICES=mlx5_0:1
 export UCX_TLS=rc,cuda_copy,cuda_ipc,shm,self
+export VLLM_NIXL_SIDE_CHANNEL_HOST=192.168.1.55
 
 #export UCX_TLS=tcp,self
 # 1 prefill worker (GPU 0)

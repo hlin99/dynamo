@@ -18,6 +18,7 @@ export UCX_MEMTYPE_CACHE=0
 export UCX_NET_DEVICES=mlx5_0:1,mlx5_1:1,mlx5_2:1,mlx5_3:1
 export UCX_NET_DEVICES=mlx5_0:1
 export UCX_TLS=rc,cuda_copy,cuda_ipc,shm,self
+export VLLM_NIXL_SIDE_CHANNEL_HOST=192.168.1.55
 
 #export UCX_TLS=tcp,self
 # 1 prefill worker (GPU 0)
@@ -27,6 +28,5 @@ CUDA_VISIBLE_DEVICES=0 python3 -m dynamo.vllm \
     --max-model-len 1024 \
     --block-size $BLOCK_SIZE \
     --enforce-eager \
-    --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_consumer\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"]}}" \
-    --is-prefill-worker \
+    --kv-transfer-config "{\"kv_connector\": \"NixlConnector\", \"kv_role\": \"kv_consumer\", \"kv_buffer_device\": \"${NIXL_BUFFER_DEVICE}\", \"kv_connector_extra_config\": {\"backends\": [\"${VLLM_NIXL_BACKEND}\"], \"enable_permute_local_kv\": true}}" \
     --kv-events-config '{"publisher":"zmq","topic":"kv-events","endpoint":"tcp://*:5558", "enable_kv_cache_events":true}'
